@@ -69,11 +69,11 @@ namespace ShopOnline.Api.Controllers
             }
         }
         [HttpPost]
-        public async Task<ActionResult<CartItemDto>> PostItem([FromBody] CartItemToAddDto itemToAddDto)
+        public async Task<ActionResult<CartItemDto>> PostItem([FromBody] CartItemToAddDto cartItemToAddDto)
         {
             try
             {
-                var newCartItem = await this._shoppingCartRepository.AddItem(itemToAddDto);
+                var newCartItem = await this._shoppingCartRepository.AddItem(cartItemToAddDto);
                 if(newCartItem == null)
                 {
                     return NoContent();
@@ -81,7 +81,7 @@ namespace ShopOnline.Api.Controllers
                 var product = await _productRepository.GetItem(newCartItem.ProductId);
                 if(product == null)
                 {
-                    throw new Exception($"Something went wrong when attempting to retrieve product (productId:({itemToAddDto.ProductId}");
+                    throw new Exception($"Something went wrong when attempting to retrieve product (productId:({cartItemToAddDto.ProductId}");
                 }
                 var newCartItemDto = newCartItem.ConvertToDto(product);
                 return CreatedAtAction(nameof(GetItem), new {id = newCartItemDto.Id}, newCartItemDto);
@@ -107,6 +107,25 @@ namespace ShopOnline.Api.Controllers
                 var cartItemDto = cartItem.ConvertToDto(product);
                 return Ok(cartItemDto);
                                             
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        [HttpPatch("{id:int}")]
+        public async Task<ActionResult<CartItemDto>> UpdateQty(int id, CartItemQtyUpdateDto cartItemQtyUpdateDto)
+        {
+            try
+            {
+                var cartItem = await this._shoppingCartRepository.UpdateQty(id, cartItemQtyUpdateDto);
+                if(cartItem == null)
+                {
+                    return NotFound();
+                }
+                var product = await _productRepository.GetItem(cartItem.ProductId);
+                var cartItemDto = cartItem.ConvertToDto(product);
+                return Ok(cartItemDto);
             }
             catch (Exception ex)
             {

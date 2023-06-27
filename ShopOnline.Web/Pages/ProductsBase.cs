@@ -8,6 +8,8 @@ namespace ShopOnline.Web.Pages
     {
         [Inject]
         public IProductService ProductService { get; set; }
+        [Inject]
+        public IShoppingCartService ShoppingCartService { get; set; }
         public IEnumerable<ProductDto> Products { get; set; }
 
         //public string ErrorMessage { get; set; }
@@ -17,15 +19,16 @@ namespace ShopOnline.Web.Pages
             try
             {
                 Products = await ProductService.GetItems();
+                var shoppingCartItems = await ShoppingCartService.GetItems(HardCoded.UserId);
                 //await ClearLocalStorage();
 
                 //Products =  await ManageProductsLocalStorageService.GetCollection();
 
                 //var shoppingCartItems = await ManageCartItemsLocalStorageService.GetCollection();
-               
-                //var totalQty = shoppingCartItems.Sum(i => i.Qty);
 
-                //ShoppingCartService.RaiseEventOnShoppingCartChanged(totalQty);
+                var totalQty = shoppingCartItems.Sum(i => i.Qty);
+
+                ShoppingCartService.RaiseEventOnShoppingCartChanged(totalQty);
 
             }
             catch (Exception ex)
