@@ -24,15 +24,14 @@ namespace ShopOnline.Api.Controllers
             try
             {
                 var products = await this._productRepository.GetItems();
-                var productCategories = await this._productRepository.GetCategories();   
 
-                if (products == null || productCategories == null)
+                if (products == null)
                 { 
                    return NotFound();
                 }
                 else
                 {
-                    var productDtos = products.ConvertToDto(productCategories);
+                    var productDtos = products.ConvertToDto();
 
                     return Ok(productDtos);
                 }
@@ -58,8 +57,7 @@ namespace ShopOnline.Api.Controllers
                 }
                 else
                 {
-                    var productCategory = await this._productRepository.GetCategory(product.CategoryId);
-                    var productDto = product.ConvertToDto(productCategory);
+                    var productDto = product.ConvertToDto();
                     return Ok(productDto);
                 }
 
